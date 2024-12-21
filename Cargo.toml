@@ -5,5 +5,7 @@ edition = "2021"
 
 [dependencies]
 account_sdk = { git = "https://github.com/cartridge-gg/controller", package = "account_sdk" }
-starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", rev = "8755b68675f103ee011f1d964fcec55f1902fa09" }
+# starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", rev = "8755b68675f103ee011f1d964fcec55f1902fa09" }
+starknet = "0.12.0"
 tokio = { version = "1.39.0", features = ["full"] }
+cainome = { git = "https://github.com/cartridge-gg/cainome" }
