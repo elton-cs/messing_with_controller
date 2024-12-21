@@ -1,0 +1,9 @@
+[package]
+name = "messing_with_controller"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+account_sdk = { git = "https://github.com/cartridge-gg/controller", package = "account_sdk" }
+starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", rev = "8755b68675f103ee011f1d964fcec55f1902fa09" }
+tokio = { version = "1.39.0", features = ["full"] }
