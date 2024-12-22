@@ -16,7 +16,9 @@ const SELECTOR_ADDRESS: &str = "0x2ccc78c905d9fa42a542b8de8c438559ebac7eaecedf5c
 // });
 
 #[tokio::main]
-async fn main() {
+async fn main() {}
+
+fn generate_cw_bindgen() {
     let mut aliases = HashMap::new();
     aliases.insert(
         String::from("crosswordle::components::gamestart::GameStartComponent::Event"),
