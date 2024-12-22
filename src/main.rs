@@ -1,35 +1,49 @@
-use cainome::cairo_serde::ByteArray;
-use messing_with_controller::crosswordle_crosswordle::CrosswordleCrosswordle;
-use starknet::{
-    accounts::{ExecutionEncoding, SingleOwnerAccount},
-    core::types::Felt,
-    providers::{jsonrpc::HttpTransport, JsonRpcClient, Provider, Url},
-    signers::{LocalWallet, SigningKey},
-};
+use std::collections::HashMap;
+
+use cainome::rs::{abigen, Abigen};
+mod cw;
 
 const PRIVATE_KEY: &str = "0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b";
 const WALLET_ADDRESS: &str = "0x5b6b8189bb580f0df1e6d6bec509ff0d6c9be7365d10627e0cf222ec1b47a71";
 const RPC_URL: &str = "https://api.cartridge.gg/x/crosswordle/katana";
 const SELECTOR_ADDRESS: &str = "0x2ccc78c905d9fa42a542b8de8c438559ebac7eaecedf5cd932ffbd46fd98729";
 
+// abigen!(Crosswordle, "/Users/zkl10/dev/l10labs/crosswordle_contracts/target/release/crosswordle_Crosswordle.contract_class.json");
+
+// abigen!(Crosswordle, "/Users/zkl10/dev/l10labs/crosswordle_contracts/target/release/crosswordle_Crosswordle.contract_class.json", type_aliases {
+//     crosswordle::components::gamestart::GameStartComponent::Event as GameStartComponentEvent;
+//     crosswordle::components::basewordles::BaseWordlesComponent::Event as BaseWordlesComponentEvent;
+// });
+
 #[tokio::main]
 async fn main() {
-    let provider = JsonRpcClient::new(HttpTransport::new(Url::parse(RPC_URL).unwrap()));
-    let chain_id = provider.chain_id().await.unwrap();
-    let signer = LocalWallet::from(SigningKey::from_secret_scalar(Felt::from_hex_unchecked(
-        PRIVATE_KEY,
-    )));
-    let address = Felt::from_hex_unchecked(WALLET_ADDRESS);
+    let mut aliases = HashMap::new();
+    aliases.insert(
+        String::from("crosswordle::components::gamestart::GameStartComponent::Event"),
+        String::from("GameStartComponentEvent"),
+    );
+    aliases.insert(
+        String::from("crosswordle::components::basewordles::BaseWordlesComponent::Event"),
+        String::from("BaseWordlesComponentEvent"),
+    );
+    aliases.insert(
+        String::from("crosswordle::systems::crosswordle::Crosswordle::Event"),
+        String::from("CrosswordleEvent"),
+    );
+    aliases.insert(
+        String::from("dojo::contract::components::upgradeable::upgradeable_cpt::Event"),
+        String::from("DojoUpgradeableEvent"),
+    );
+    aliases.insert(
+        String::from("dojo::contract::components::world_provider::world_provider_cpt::Event"),
+        String::from("DojoWorldProviderEvent"),
+    );
 
-    let account =
-        SingleOwnerAccount::new(provider, signer, address, chain_id, ExecutionEncoding::New);
-
-    let crosswordle =
-        CrosswordleCrosswordle::new(Felt::from_hex_unchecked(SELECTOR_ADDRESS), account);
-
-    let guess = ByteArray::from_string("STARK").unwrap();
-
-    // let transaction1 = crosswordle.start_game().send().await.unwrap();
-    let transaction2 = crosswordle.submit_guess(&guess).send().await.unwrap();
-    println!("{:?}", transaction2);
+    let rustgen = Abigen::new("Crosswordle", "/Users/zkl10/dev/l10labs/crosswordle_contracts/target/release/crosswordle_Crosswordle.contract_class.json");
+    let _gen_to_file = rustgen
+        .with_types_aliases(aliases)
+        .generate()
+        .unwrap()
+        .write_to_file("./src/cw.rs")
+        .unwrap();
 }
